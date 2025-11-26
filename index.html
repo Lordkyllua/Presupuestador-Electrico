@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presupuestador Eléctrico - AAIERIC</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/x-icon" href="assets/icons/icon-192.png">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo-container">
+                <img src="assets/icons/icon-192.png" alt="Logo" class="app-logo">
+                <div class="header-text">
+                    <h1>⚡ Presupuestador Eléctrico</h1>
+                    <p>Basado en tablas AAIERIC - Noviembre 2025</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navegación por pasos -->
+        <nav class="steps-nav">
+            <button class="step-btn active" data-step="0">🔧 Config</button>
+            <button class="step-btn" data-step="1">📋 Info</button>
+            <button class="step-btn" data-step="2">🛠️ Trabajos</button>
+            <button class="step-btn" data-step="3">💰 Resumen</button>
+        </nav>
+
+        <!-- Loading -->
+        <div id="loading" class="loading-overlay">
+            <div class="loading-spinner"></div>
+            <p>Cargando aplicación...</p>
+        </div>
+
+        <!-- Paso 0: Configuración -->
+        <section id="step-0" class="step active">
+            <div class="configuracion-empresa">
+                <h2>Configuración de tu Empresa</h2>
+                
+                <div class="campo-config">
+                    <label>Nombre de la Empresa:</label>
+                    <input type="text" id="nombre-empresa" placeholder="Ej: ElectroServicios SA">
+                </div>
+                
+                <div class="campo-config">
+                    <label>Logo (opcional):</label>
+                    <div class="logo-upload-container">
+                        <input type="file" id="logo-empresa" accept="image/*" class="logo-input">
+                        <button type="button" onclick="document.getElementById('logo-empresa').click()" class="btn-secondary">
+                            📁 Seleccionar Logo
+                        </button>
+                        <button type="button" onclick="eliminarLogo()" class="btn-danger" style="display: none;" id="btn-eliminar-logo">
+                            🗑️ Eliminar
+                        </button>
+                    </div>
+                    <div id="logo-preview" class="logo-preview"></div>
+                </div>
+                
+                <div class="campo-config">
+                    <label>Porcentaje de Descuento Predeterminado:</label>
+                    <input type="number" id="descuento-default" min="0" max="50" value="0">%
+                </div>
+                
+                <div class="campo-config">
+                    <label>Contacto (opcional):</label>
+                    <input type="text" id="contacto-empresa" placeholder="Teléfono/Email">
+                </div>
+                
+                <div class="config-buttons">
+                    <button class="btn-primary" onclick="guardarConfiguracion()">💾 Guardar Configuración</button>
+                    <button class="btn-secondary" onclick="cargarConfiguracionDemo()">🔄 Cargar Demo</button>
+                </div>
+                
+                <div class="info-box">
+                    <h3>🔄 Estado de Precios</h3>
+                    <p id="estado-precios">Cargando precios actualizados...</p>
+                    <div class="precio-buttons">
+                        <button class="btn-secondary" onclick="actualizarPreciosManual()">🔄 Actualizar Precios Ahora</button>
+                        <button class="btn-secondary" onclick="exportarDatos()">💾 Exportar Datos</button>
+                        <button class="btn-secondary" onclick="document.getElementById('importar-datos').click()">📤 Importar Datos</button>
+                        <input type="file" id="importar-datos" accept=".json" style="display: none;" onchange="importarDatos(event)">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Paso 1: Información General -->
+        <section id="step-1" class="step">
+            <h2>Información del Presupuesto</h2>
+            
+            <div class="form-group">
+                <label for="cliente-nombre">Nombre del Cliente:</label>
+                <input type="text" id="cliente-nombre" placeholder="Ej: Juan Pérez">
+            </div>
+            
+            <div class="form-group">
+                <label for="trabajo-descripcion">Descripción del Trabajo:</label>
+                <textarea id="trabajo-descripcion" placeholder="Ej: Ampliación eléctrica para cocina y living..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="descuento-presupuesto">Descuento Global (%):</label>
+                <input type="number" id="descuento-presupuesto" min="0" max="50" value="0">
+            </div>
+            
+            <div class="form-group">
+                <label for="validez-presupuesto">Válido hasta:</label>
+                <input type="date" id="validez-presupuesto">
+            </div>
+            
+            <button class="btn-primary" onclick="siguientePaso(2)">Continuar a Trabajos →</button>
+        </section>
+
+        <!-- Paso 2: Selección de Trabajos -->
+        <section id="step-2" class="step">
+            <h2>Selección de Trabajos y Conceptos</h2>
+            
+            <div class="controles-busqueda">
+                <div class="busqueda">
+                    <input type="text" id="buscar-item" placeholder="🔍 Buscar concepto...">
+                </div>
+                <div class="filtros">
+                    <select id="filtro-categoria">
+                        <option value="">Todas las categorías</option>
+                        <option value="servicios_basicos">🛠️ Servicios Básicos</option>
+                        <option value="canalizacion">🔌 Canalización</option>
+                        <option value="puntos_tomas">⚡ Puntos y Tomas</option>
+                        <option value="tableros">🔋 Tableros</option>
+                        <option value="artefactos">💡 Artefactos</option>
+                        <option value="acometidas">🏢 Acometidas</option>
+                        <option value="bandejas">📦 Bandejas</option>
+                        <option value="automatismos">🔧 Automatismos</option>
+                        <option value="certificados">📄 Certificados</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="resumen-rapido">
+                <strong>Items seleccionados: <span id="contador-items">0</span></strong>
+                <strong>Subtotal: $ <span id="subtotal-rapido">0</span></strong>
+            </div>
+            
+            <div id="categorias-trabajos" class="categorias">
+                <!-- Las categorías se cargan dinámicamente desde JavaScript -->
+            </div>
+            
+            <div class="navigation-buttons">
+                <button class="btn-secondary" onclick="siguientePaso(1)">← Volver</button>
+                <button class="btn-primary" onclick="siguientePaso(3)">Ver Resumen →</button>
+            </div>
+        </section>
+
+        <!-- Paso 3: Resumen y PDF -->
+        <section id="step-3" class="step">
+            <h2>Resumen del Presupuesto</h2>
+            
+            <div id="resumen-presupuesto" class="resumen-container">
+                <!-- El resumen se genera dinámicamente -->
+            </div>
+            
+            <div class="navigation-buttons">
+                <button class="btn-secondary" onclick="siguientePaso(2)">← Modificar Trabajos</button>
+                <button class="btn-primary" onclick="generarPDF()">📄 Descargar PDF</button>
+                <button class="btn-secondary" onclick="limpiarPresupuesto()">🔄 Nuevo Presupuesto</button>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Desarrollado por <strong>DC Electricista</strong> | Precios según <a href="https://aaieric.org.ar/costos-mano-de-obra" target="_blank">AAIERIC</a></p>
+            <p id="version-precios">Última actualización: Cargando...</p>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- Módulos de la aplicación -->
+    <script src="config/default-config.js"></script>
+    <script src="config/user-settings.js"></script>
+    <script src="utils/helpers.js"></script>
+    <script src="utils/price-updater.js"></script>
+    <script src="utils/pdf-generator.js"></script>
+    <script src="app.js"></script>
+</body>
+  </html>
