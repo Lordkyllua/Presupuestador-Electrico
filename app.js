@@ -369,20 +369,54 @@ function generarResumen() {
     container.innerHTML = html;
 }
 
-// Generación de PDF
+
+// Generación de PDF - Versión corregida
 async function generarPDF() {
     try {
-        const pdfDoc = pdfGenerator
-            .inicializar()
-            .generarPresupuesto(estado.presupuestoActual, estado.configUsuario);
-            
-        const nombreArchivo = `Presupuesto_${estado.presupuestoActual.info.cliente.replace(/[^a-zA-Z0-9]/g, '_')}`;
+        // Validar que haya datos para el PDF
+        if (!estado.presupuestoActual.info.cliente || estado.presupuestoActual.items.length === 0) {
+            Helpers.mostrarNotificacion('No hay datos suficientes para generar el PDF', 'error');
+            return;
+        }
+
+        // Mostrar mensaje de generación
+        Helpers.mostrarNotificacion('Generando PDF...', 'info');
+
+        // Pequeño delay para que se vea el mensaje
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Generar el PDF
+        const pdfDoc = pdfGenerator.generarPresupuesto(
+            estado.presupuestoActual, 
+            estado.configUsuario
+        );
+
+        // Crear nombre de archivo seguro
+        const nombreCliente = estado.presupuestoActual.info.cliente
+            .replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s]/g, '')
+            .replace(/\s+/g, '_')
+            .substring(0, 30);
+
+        const nombreArchivo = `Presupuesto_${nombreCliente}`;
+
+        // Descargar el PDF
         pdfGenerator.descargar(nombreArchivo);
-        
+
         Helpers.mostrarNotificacion('PDF generado correctamente', 'success');
+
     } catch (error) {
         console.error('Error generando PDF:', error);
-        Helpers.mostrarNotificacion('Error generando el PDF', 'error');
+        
+        let mensajeError = 'Error generando el PDF';
+        if (error.message.includes('jsPDF')) {
+            mensajeError += '. La librería PDF no está cargada correctamente.';
+        } else if (error.message.includes('addImage')) {
+            mensajeError += '. Problema con el logo de la empresa.';
+        } else {
+            mensajeError += ': ' + error.message;
+        }
+        
+        Helpers.mostrarNotificacion(mensajeError, 'error');
     }
 }
 
