@@ -17,7 +17,8 @@ class UserSettings {
 
     cargarConfiguracion() {
         try {
-            return JSON.parse(localStorage.getItem('configUsuario'));
+            const config = localStorage.getItem('configUsuario');
+            return config ? JSON.parse(config) : null;
         } catch (error) {
             console.error('Error cargando configuración:', error);
             return null;
@@ -39,29 +40,11 @@ class UserSettings {
         return this.config;
     }
 
-    limpiarConfiguracion() {
-        localStorage.removeItem('configUsuario');
-        this.config = this.getConfiguracionDefault();
-    }
-
-    // Métodos específicos para manejo del logo
-    guardarLogo(logoData) {
-        return new Promise((resolve, reject) => {
-            try {
-                this.config.logo = logoData;
-                this.guardarConfiguracion(this.config);
-                resolve(true);
-            } catch (error) {
-                reject(error);
-            }
-        });
-    }
-
     eliminarLogo() {
         this.config.logo = null;
         return this.guardarConfiguracion(this.config);
     }
 }
 
-// Exportar instancia única
+// Crear instancia única
 const userSettings = new UserSettings();
