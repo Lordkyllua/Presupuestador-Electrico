@@ -1,0 +1,31 @@
+{
+    "servicios_basicos": [
+        {"id": "visita", "descripcion": "Visita: Inspección Ocular, Evaluación, Diagnóstico, Asesoramiento y Presupuesto", "precio": 43043},
+        {"id": "urgencia", "descripcion": "Urgencia: Lunes a Sábado a partir 20:00 hs/Domingo y Feriado (mínimo)", "precio": 103191},
+        {"id": "boca_completa", "descripcion": "Unidad básica de cotización para todo trabajo eléctrico: 1(una) boca completa", "precio": 85935},
+        {"id": "service_minimo", "descripcion": "Service - Instalación (mínimo)", "precio": 85935},
+        {"id": "hora_trabajo_minimo", "descripcion": "Hora de Trabajo (mínimo)", "precio": 43043}
+    ],
+    "canalizacion": [
+        {"id": "canal_losa_metal", "descripcion": "Canalización de cañería en losa con caño metálico", "precio": 43505},
+        {"id": "canal_loseta_metal", "descripcion": "Canalización en loseta con caño metálico", "precio": 45680},
+        {"id": "amurado_ladrillo_comun", "descripcion": "Amurado de cañería en mampostería - Ladrillo común", "precio": 49441},
+        {"id": "amurado_ladrillo_hueco", "descripcion": "Amurado de cañería en mampostería - Ladrillo hueco", "precio": 48266}
+    ],
+    "puntos_tomas": [
+        {"id": "punto_simple", "descripcion": "Punto, toma simple, portalámpara", "precio": 15347},
+        {"id": "toma_doble", "descripcion": "Toma doble", "precio": 19437},
+        {"id": "punto_combinacion", "descripcion": "Punto Combinación", "precio": 16518}
+    ],
+    "tableros": [
+        {"id": "tp_monofasico", "descripcion": "TP Monofásico con 1 ID y 1 TM + PAT", "precio": 253859},
+        {"id": "solo_pat", "descripcion": "Solo PAT", "precio": 128855},
+        {"id": "tp_trifasico", "descripcion": "TP Trifásico con 1 ID y 1 TM + PAT", "precio": 343773}
+    ],
+    "artefactos": [
+        {"id": "aplique_simple", "descripcion": "Artefacto aplique simple", "precio": 23550},
+        {"id": "spot_led", "descripcion": "Spot Led por unidad", "precio": 23550},
+        {"id": "colgante_3_luces", "descripcion": "Artefacto colgante liviano 3 luces 1 efecto", "precio": 47102},
+        {"id": "ventilador_techo", "descripcion": "Ventilador de techo", "precio": 85935}
+    ]
+}
