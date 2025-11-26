@@ -14,7 +14,7 @@ const DEFAULT_CONFIG = {
     
     PRECIOS: {
         SOURCE_URL: 'https://aaieric.org.ar/costos-mano-de-obra',
-        FALLBACK_FILE: '/precios.json',
+        FALLBACK_FILE: 'precios.json',
         CACHE_DURATION: 24 * 60 * 60 * 1000 // 24 horas
     },
     
