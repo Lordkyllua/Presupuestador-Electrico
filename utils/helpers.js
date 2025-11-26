@@ -11,45 +11,63 @@ class Helpers {
             day: '2-digit'
         };
         
-        return new Date(fechaISO).toLocaleDateString(
-            DEFAULT_CONFIG.UI.DATE_FORMAT, 
-            { ...opcionesDefault, ...opciones }
-        );
+        if (!fechaISO) return 'No especificada';
+        return new Date(fechaISO).toLocaleDateString('es-AR', { ...opcionesDefault, ...opciones });
     }
 
     static obtenerFechaValidezDefault() {
         const fecha = new Date();
-        fecha.setDate(fecha.getDate() + DEFAULT_CONFIG.UI.DEFAULT_VALIDITY_DAYS);
+        fecha.setDate(fecha.getDate() + 30);
         return fecha.toISOString().split('T')[0];
     }
 
-    static generarIdUnico() {
-        return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    static mostrarNotificacion(mensaje, tipo = 'info', duracion = 5000) {
+        // Crear elemento de notificación
+        const notificacion = document.createElement('div');
+        notificacion.className = `notification ${tipo}`;
+        notificacion.innerHTML = `
+            <div class="notification-content">
+                <span class="notification-message">${mensaje}</span>
+                <button class="notification-close" onclick="this.parentElement.parentElement.remove()">×</button>
+            </div>
+        `;
+
+        // Estilos para la notificación
+        notificacion.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${this.obtenerColorNotificacion(tipo)};
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 10000;
+            max-width: 400px;
+            animation: slideInRight 0.3s ease;
+        `;
+
+        document.body.appendChild(notificacion);
+
+        // Auto-eliminar después de la duración
+        setTimeout(() => {
+            if (notificacion.parentElement) {
+                notificacion.remove();
+            }
+        }, duracion);
     }
 
-    static validarEmail(email) {
-        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return regex.test(email);
-    }
-
-    static validarTelefono(telefono) {
-        const regex = /^[0-9+\-\s()]{10,}$/;
-        return regex.test(telefono);
-    }
-
-    static debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
+    static obtenerColorNotificacion(tipo) {
+        const colores = {
+            success: '#10b981',
+            error: '#ef4444',
+            warning: '#f59e0b',
+            info: '#3b82f6'
         };
+        return colores[tipo] || '#3b82f6';
     }
 
-    static async cargarImagenComoDataURL(archivo) {
+    static cargarImagenComoDataURL(archivo) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onload = (e) => resolve(e.target.result);
@@ -83,69 +101,11 @@ class Helpers {
         });
     }
 
-    static mostrarNotificacion(mensaje, tipo = 'info', duracion = 5000) {
-        // Crear elemento de notificación
-        const notificacion = document.createElement('div');
-        notificacion.className = `notificacion notificacion-${tipo}`;
-        notificacion.innerHTML = `
-            <div class="notificacion-contenido">
-                <span class="notificacion-icono">${this.obtenerIconoNotificacion(tipo)}</span>
-                <span class="notificacion-mensaje">${mensaje}</span>
-                <button class="notificacion-cerrar" onclick="this.parentElement.parentElement.remove()">×</button>
-            </div>
-        `;
-
-        // Estilos para la notificación
-        notificacion.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: ${this.obtenerColorNotificacion(tipo)};
-            color: white;
-            padding: 15px;
-            border-radius: 5px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 10000;
-            max-width: 400px;
-            animation: slideInRight 0.3s ease;
-        `;
-
-        document.body.appendChild(notificacion);
-
-        // Auto-eliminar después de la duración
-        setTimeout(() => {
-            if (notificacion.parentElement) {
-                notificacion.style.animation = 'slideOutRight 0.3s ease';
-                setTimeout(() => notificacion.remove(), 300);
-            }
-        }, duracion);
-    }
-
-    static obtenerIconoNotificacion(tipo) {
-        const iconos = {
-            success: '✅',
-            error: '❌',
-            warning: '⚠️',
-            info: 'ℹ️'
-        };
-        return iconos[tipo] || 'ℹ️';
-    }
-
-    static obtenerColorNotificacion(tipo) {
-        const colores = {
-            success: '#10b981',
-            error: '#ef4444',
-            warning: '#f59e0b',
-            info: '#3b82f6'
-        };
-        return colores[tipo] || '#3b82f6';
-    }
-
     static exportarDatos() {
         const datos = {
             configUsuario: userSettings.obtenerConfiguracion(),
-            precios: priceUpdater.obtenerPrecios(),
-            ultimaActualizacion: priceUpdater.ultimaActualizacion,
+            precios: JSON.parse(localStorage.getItem('preciosAAIERIC') || '{}'),
+            ultimaActualizacion: localStorage.getItem('ultimaActualizacionPrecios'),
             exportado: new Date().toISOString()
         };
 
@@ -189,45 +149,3 @@ class Helpers {
         });
     }
 }
-
-// Añadir estilos CSS para las animaciones de notificación
-const estilosNotificacion = document.createElement('style');
-estilosNotificacion.textContent = `
-    @keyframes slideInRight {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-    
-    @keyframes slideOutRight {
-        from {
-            transform: translateX(0);
-            opacity: 1;
-        }
-        to {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-    }
-    
-    .notificacion-contenido {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    
-    .notificacion-cerrar {
-        background: none;
-        border: none;
-        color: white;
-        font-size: 18px;
-        cursor: pointer;
-        margin-left: auto;
-    }
-`;
-document.head.appendChild(estilosNotificacion);
